@@ -16,7 +16,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func handleWebsocket(rw http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/create_connection" {
+	if r.URL.Path != "/connect" {
 		http.Error(rw, "404 not found.", http.StatusNotFound)
 		return
 	}
@@ -36,15 +36,14 @@ func handleWebsocket(rw http.ResponseWriter, r *http.Request) {
 
 	for {
 		messageType, message, err := conn.ReadMessage()
-
 		if err != nil {
 			log.Println("Error when read:", err)
 			break
 		}
 
 		log.Printf("Received: %s", message)
-		err = conn.WriteMessage(messageType, message)
 
+		err = conn.WriteMessage(messageType, message)
 		if err != nil {
 			log.Println("Error when write:", err)
 			break
@@ -55,6 +54,6 @@ func handleWebsocket(rw http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	http.HandleFunc("/create_connection", handleWebsocket)
+	http.HandleFunc("/connect", handleWebsocket)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
